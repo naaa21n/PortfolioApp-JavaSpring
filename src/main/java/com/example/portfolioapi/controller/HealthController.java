@@ -1,44 +1,36 @@
 package com.example.portfolioapi.controller;
 
-import com.example.portfolioapi.entity.Task;
-import com.example.portfolioapi.repository.TaskRepository;
+import com.example.portfolioapi.entity.Health;
+import com.example.portfolioapi.repository.HealthRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/healths")
 @CrossOrigin(origins = "http://localhost:3000")
 public class HealthController {
 
-    private final TaskRepository taskRepository;
+    private final HealthRepository healthRepository;
 
-    public HealthController(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
+    public HealthController(HealthRepository healthRepository) {
+        this.healthRepository = healthRepository;
     }
 
-    @GetMapping("/healths")
-    public List<Task> getHealths() {
-        return taskRepository.findAll();
+    @GetMapping
+    public List<Health> getHealths() {
+        return healthRepository.findAll();
     }
 
-    @PostMapping("/healths")
-    public List<Task> addHealth(@RequestBody Task task) {
-        taskRepository.save(task);
-        return taskRepository.findAll();
+    @PostMapping
+    public List<Health> addHealth(@RequestBody Health health) {
+        healthRepository.save(health);
+        return healthRepository.findAll();
     }
 
-    @DeleteMapping("/healths/{id}")
-    public List<Task> deleteHealth(@PathVariable String id) {
-        taskRepository.deleteById(id);
-        return taskRepository.findAll();
-    }
-
-    @PutMapping("/healths/{id}/done")
-    public List<Task> completeHealth(@PathVariable String id) {
-        Task task = taskRepository.findById(id).orElseThrow();
-        task.setDone(true);
-        taskRepository.save(task);
-        return taskRepository.findAll();
+    @DeleteMapping("/{id}")
+    public List<Health> deleteHealth(@PathVariable String id) {
+        healthRepository.deleteById(id);
+        return healthRepository.findAll();
     }
 }
