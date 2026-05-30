@@ -1,13 +1,13 @@
 package com.example.portfolioapi.repository;
 
-// Taskエンティティ
-import com.example.portfolioapi.entity.Task;
+// Userエンティティ
+import com.example.portfolioapi.entity.User;
 
 // Spring Data JPA
 import org.springframework.data.jpa.repository.JpaRepository;
 
 // =========================
-// Task Repository
+// User Repository
 // =========================
 
 // Repositoryインターフェース
@@ -15,8 +15,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 // DB操作を担当する
 //
 // JpaRepository<エンティティ型, ID型>
-public interface TaskRepository
-        extends JpaRepository<Task, String> {
+public interface UserRepository
+        extends JpaRepository<User, String> {
+
+    // =========================
+    // email検索
+    // =========================
+
+    // emailを使ってユーザー検索
+    //
+    // SQLイメージ:
+    // SELECT * FROM "user"
+    // WHERE email = ?
+    //
+    // ログイン時や重複チェックで使用
+    User findByEmail(String email);
 
     // =========================
     // JpaRepositoryで自動利用可能
@@ -38,16 +51,10 @@ public interface TaskRepository
     // -> 件数取得
 
     // =========================
-    // 今は追加メソッドなし
+    // 今後追加できる検索例
     // =========================
 
-    // 必要になったら独自検索追加可能
+    // User findByName(String name);
     //
-    // 例:
-    //
-    // List<Task> findByDone(boolean done);
-    //
-    // List<Task> findByTitle(String title);
-    //
-    // List<Task> findByCreatedAt(LocalDateTime createdAt);
+    // List<User> findByNameContaining(String keyword);
 }
