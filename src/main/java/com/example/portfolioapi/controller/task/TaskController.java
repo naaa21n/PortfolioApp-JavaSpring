@@ -1,10 +1,10 @@
-package com.example.portfolioapi.controller;
+package com.example.portfolioapi.controller.task;
 
 // Taskエンティティ
-import com.example.portfolioapi.entity.Task;
+import com.example.portfolioapi.entity.task.Task;
 
 // Taskテーブル操作用Repository
-import com.example.portfolioapi.repository.TaskRepository;
+import com.example.portfolioapi.repository.task.TaskRepository;
 
 // Spring MVC
 import org.springframework.web.bind.annotation.*;

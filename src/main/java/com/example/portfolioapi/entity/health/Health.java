@@ -1,17 +1,44 @@
-package com.example.portfolioapi.entity;
+package com.example.portfolioapi.entity.health;
 
-import jakarta.persistence.Column;
+// =========================
+// JPA Import
+// =========================
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import java.time.LocalDate;
+
+// =========================
+// Health Entity
+// =========================
+//
+// 健康記録テーブル
+//
+// 主な管理項目
+//
+// ・日付
+// ・歩数
+// ・運動時間
+// ・睡眠時間
+// ・水分摂取量
+//
 @Entity
 public class Health {
+
+    // =========================
+    // Primary Key
+    // =========================
 
     @Id
     private String id;
 
-    // 日付
-    private String date;
+    // =========================
+    // Health Data
+    // =========================
+
+    // 記録日
+    private LocalDate date;
 
     // 歩数
     private Integer steps;
@@ -19,30 +46,22 @@ public class Health {
     // 運動時間(分)
     private Integer exerciseMinutes;
 
-    // 睡眠時間
+    // 睡眠時間(時間)
     private Double sleepHours;
 
     // 水分摂取量(ml)
     private Integer waterMl;
 
-    // 日記
-    @Column(length = 2000)
-    private String diary;
-
-    // 感謝したこと
-    @Column(length = 2000)
-    private String gratitude;
-
-    // 頑張ったこと
-    @Column(length = 2000)
-    private String achievement;
-
-    // 明日の目標
-    @Column(length = 2000)
-    private String tomorrowGoal;
+    // =========================
+    // Constructor
+    // =========================
 
     public Health() {
     }
+
+    // =========================
+    // Getter / Setter
+    // =========================
 
     public String getId() {
         return id;
@@ -52,13 +71,20 @@ public class Health {
         this.id = id;
     }
 
-    public String getDate() {
+    // =========================
+    // Date
+    // =========================
+
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(
+            LocalDate date
+    ) {
         this.date = date;
     }
+
 
     public Integer getSteps() {
         return steps;
@@ -90,37 +116,5 @@ public class Health {
 
     public void setWaterMl(Integer waterMl) {
         this.waterMl = waterMl;
-    }
-
-    public String getDiary() {
-        return diary;
-    }
-
-    public void setDiary(String diary) {
-        this.diary = diary;
-    }
-
-    public String getGratitude() {
-        return gratitude;
-    }
-
-    public void setGratitude(String gratitude) {
-        this.gratitude = gratitude;
-    }
-
-    public String getAchievement() {
-        return achievement;
-    }
-
-    public void setAchievement(String achievement) {
-        this.achievement = achievement;
-    }
-
-    public String getTomorrowGoal() {
-        return tomorrowGoal;
-    }
-
-    public void setTomorrowGoal(String tomorrowGoal) {
-        this.tomorrowGoal = tomorrowGoal;
     }
 }

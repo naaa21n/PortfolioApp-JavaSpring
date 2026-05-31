@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Mavenプロジェクト設定 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <!-- Mavenモデルバージョン -->
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Spring Boot親プロジェクト -->
+    <!-- バージョン管理などを自動化 -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -12,30 +17,38 @@
         <relativePath/>
     </parent>
 
+    <!-- プロジェクト情報 -->
     <groupId>com.example</groupId>
     <artifactId>portfolio-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>portfolio-api</name>
 
+    <!-- Javaバージョン -->
     <properties>
         <java.version>17</java.version>
     </properties>
 
+    <!-- ========================= -->
+    <!-- 依存ライブラリ -->
+    <!-- ========================= -->
     <dependencies>
 
-        <!-- Spring Boot Web -->
+        <!-- Spring MVC -->
+        <!-- REST API作成用 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- JPA -->
+        <!-- Spring Data JPA -->
+        <!-- EntityとRepository操作用 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- PostgreSQL -->
+        <!-- PostgreSQL Driver -->
+        <!-- PostgreSQL接続用 -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -43,6 +56,7 @@
         </dependency>
 
         <!-- DevTools -->
+        <!-- 自動再起動など開発支援 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -50,28 +64,52 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Spring Security -->
+        <!-- ログイン認証・認可機能 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- Lombok -->
+        <!-- Getter/Setter自動生成 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 
+        <!-- Spring Boot Test -->
+        <!-- JUnitやMockMvcなどテスト機能 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
-
-
+    <!-- ========================= -->
+    <!-- ビルド設定 -->
+    <!-- ========================= -->
     <build>
+
         <plugins>
+
+            <!-- Spring Boot実行・パッケージ化 -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
         </plugins>
+
     </build>
 
 </project>
+
+
+<!-- いずれ必要な依存関係 -->
+<!-- JWTログイン機能 -->
+<!-- Swagger(API仕様書) -->
+

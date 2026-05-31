@@ -1,9 +1,11 @@
-package com.example.portfolioapi.controller;
+package com.example.portfolioapi.controller.health;
 
-import com.example.portfolioapi.entity.Health;
-import com.example.portfolioapi.repository.HealthRepository;
+import com.example.portfolioapi.entity.health.Health;
+import com.example.portfolioapi.repository.health.HealthRepository;
 
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +13,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/healths")
 @CrossOrigin(origins = "http://localhost:3000")
+
+
+
 public class HealthController {
 
     private final HealthRepository healthRepository;
@@ -29,6 +34,35 @@ public class HealthController {
     public List<Health> getHealths() {
 
         return healthRepository.findAll();
+    }
+
+    // =========================
+    // 月データ取得
+    // GET /api/healths/month
+    // =========================
+
+    @GetMapping("/month")
+    public List<Health> getMonthHealths() {
+
+        return healthRepository.findAll();
+    }
+
+
+    // =========================
+    // 日付で取得
+    // GET /api/healths/date/{date}
+    // =========================
+
+    @GetMapping("/date/{date}")
+    public Health getByDate(
+            @PathVariable String date
+    ) {
+
+        return healthRepository
+                .findByDate(
+                        LocalDate.parse(date)
+                )
+                .orElse(null);
     }
 
     // =========================
@@ -54,6 +88,9 @@ public class HealthController {
             @RequestBody Health health
     ) {
 
+        System.out.println(health.getDate());
+        System.out.println(health.getSteps());
+
         return healthRepository.save(health);
     }
 
@@ -61,6 +98,7 @@ public class HealthController {
     // 更新
     // PUT /api/healths/{id}
     // =========================
+    // 更新
     @PutMapping("/{id}")
     public Health updateHealth(
             @PathVariable String id,
@@ -76,9 +114,6 @@ public class HealthController {
 
         Health health = optional.get();
 
-        health.setDate(
-                request.getDate());
-
         health.setSteps(
                 request.getSteps());
 
@@ -90,18 +125,6 @@ public class HealthController {
 
         health.setWaterMl(
                 request.getWaterMl());
-
-        health.setDiary(
-                request.getDiary());
-
-        health.setGratitude(
-                request.getGratitude());
-
-        health.setAchievement(
-                request.getAchievement());
-
-        health.setTomorrowGoal(
-                request.getTomorrowGoal());
 
         return healthRepository.save(
                 health

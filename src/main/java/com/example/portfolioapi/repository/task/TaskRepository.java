@@ -1,7 +1,7 @@
-package com.example.portfolioapi.repository;
+package com.example.portfolioapi.repository.task;
 
 // Taskエンティティ
-import com.example.portfolioapi.entity.Task;
+import com.example.portfolioapi.entity.task.Task;
 
 // Spring Data JPA
 import org.springframework.data.jpa.repository.JpaRepository;
