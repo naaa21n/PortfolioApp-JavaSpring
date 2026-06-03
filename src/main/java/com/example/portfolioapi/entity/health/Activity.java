@@ -1,31 +1,92 @@
 package com.example.portfolioapi.entity.health;
 
+// =========================
+// Import
+// =========================
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+
+// =========================
+// Activity Entity
+// =========================
+//
+// 1日の活動時間を管理するテーブル
+//
+// 対応テーブル
+// activity
+//
+// 管理項目
+//
+// ・睡眠時間
+// ・仕事時間
+// ・勉強時間
+// ・運動時間
+// ・趣味時間
+// ・その他時間
+//
+// 円グラフ表示や
+// 行動ログ機能で利用する
+//
 @Entity
 public class Activity {
+
+    // =========================
+    // Primary Key
+    // =========================
 
     @Id
     private String id;
 
+    // =========================
+    // 活動日
+    // =========================
+    //
+    // 例:
+    // 2026-05-31
+    //
     private String date;
 
+    // =========================
+    // 睡眠時間
+    // =========================
     private Integer sleep;
 
+    // =========================
+    // 仕事時間
+    // =========================
     private Integer work;
 
+    // =========================
+    // 勉強時間
+    // =========================
     private Integer study;
 
+    // =========================
+    // 運動時間
+    // =========================
     private Integer exercise;
 
+    // =========================
+    // 趣味時間
+    // =========================
     private Integer hobby;
 
+    // =========================
+    // その他時間
+    // =========================
     private Integer other;
+
+    // =========================
+    // Constructor
+    // =========================
 
     public Activity() {
     }
 
+    // =========================
     // Getter / Setter
+    // =========================
 
     public String getId() {
         return id;
@@ -90,5 +151,4 @@ public class Activity {
     public void setOther(Integer other) {
         this.other = other;
     }
-
 }

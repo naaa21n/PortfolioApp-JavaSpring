@@ -1,5 +1,7 @@
 package com.example.portfolioapi;
 
+//メインがある一番最初に動くクラス
+
 // =========================
 // Spring Boot Import
 // =========================
