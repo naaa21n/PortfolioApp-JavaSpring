@@ -35,7 +35,6 @@ import java.util.Optional;
 @RequestMapping("/api/healths")
 
 // Next.jsからアクセス許可
-@CrossOrigin(origins = "http://localhost:3000")
 public class HealthController {
 
     // =========================

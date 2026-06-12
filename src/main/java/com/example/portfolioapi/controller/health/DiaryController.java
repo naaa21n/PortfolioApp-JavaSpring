@@ -31,7 +31,6 @@ import java.util.List;
 @RequestMapping("/api/diaries")
 
 // Next.jsからアクセス許可
-@CrossOrigin(origins = "http://localhost:3000")
 public class DiaryController {
 
     // =========================

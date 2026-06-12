@@ -40,7 +40,6 @@ import java.util.List;
 //
 @RestController
 @RequestMapping("/api/journals")
-@CrossOrigin(origins = "http://localhost:3000")
 public class JournalController {
 
     // =========================

@@ -20,8 +20,7 @@ import java.util.List;
 // /api/tasks
 @RequestMapping("/api")
 
-// Next.js(localhost:3000)からのアクセス許可
-@CrossOrigin(origins = "http://localhost:3000")
+// Next.jsからのアクセス許可
 public class TaskController {
 
     // =========================

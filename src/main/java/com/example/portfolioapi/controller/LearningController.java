@@ -20,8 +20,7 @@ import java.util.List;
 // /api/learnings
 @RequestMapping("/api/learnings")
 
-// Next.js(localhost:3000)からのアクセス許可
-@CrossOrigin(origins = "http://localhost:3000")
+// Next.jsからのアクセス許可
 public class LearningController {
 
     // =========================

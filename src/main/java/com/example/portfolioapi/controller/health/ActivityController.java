@@ -30,7 +30,6 @@ import java.util.List;
 @RequestMapping("/api/activities")
 
 // Next.jsからアクセス可能にする
-@CrossOrigin(origins = "http://localhost:3000")
 public class ActivityController {
 
     // =========================

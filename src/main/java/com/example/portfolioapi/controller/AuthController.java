@@ -25,8 +25,7 @@ import java.util.Map;
 // /api/auth/login
 @RequestMapping("/api/auth")
 
-// Next.js(localhost:3000)からのアクセス許可
-@CrossOrigin(origins = "http://localhost:3000")
+// Next.jsからのアクセス許可
 public class AuthController {
 
     // =========================

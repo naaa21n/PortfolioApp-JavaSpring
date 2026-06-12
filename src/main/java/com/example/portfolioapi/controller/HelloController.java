@@ -19,9 +19,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 // 戻り値がJSONや文字列として返される
 @RestController
 
-// localhost:3000(Next.js)からの
+// Next.jsからの
 // APIアクセスを許可
-@CrossOrigin(origins = "http://localhost:3000")
 public class HelloController {
 
     // =========================
