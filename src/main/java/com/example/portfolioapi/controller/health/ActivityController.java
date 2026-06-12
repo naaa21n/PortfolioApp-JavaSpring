@@ -4,8 +4,8 @@ package com.example.portfolioapi.controller.health;
 // Import
 // =========================
 
-import com.example.portfolioapi.entity.health.Activity;
-import com.example.portfolioapi.repository.health.ActivityRepository;
+import com.example.portfolioapi.entity.health.ActivityRecord;
+import com.example.portfolioapi.repository.health.ActivityRecordRepository;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +38,7 @@ public class ActivityController {
     //
     // Database操作担当
     //
-    private final ActivityRepository activityRepository;
+    private final ActivityRecordRepository activityRepository;
 
     // =========================
     // Constructor Injection
@@ -47,7 +47,7 @@ public class ActivityController {
     // Springが自動でRepositoryを渡してくれる
     //
     public ActivityController(
-            ActivityRepository activityRepository
+            ActivityRecordRepository activityRepository
     ) {
         this.activityRepository =
                 activityRepository;
@@ -63,7 +63,7 @@ public class ActivityController {
     // Activityテーブルの全データ取得
     //
     @GetMapping
-    public List<Activity> getAll() {
+    public List<ActivityRecord> getAll() {
 
         return activityRepository.findAll();
     }
@@ -78,7 +78,7 @@ public class ActivityController {
     // 指定日付の行動記録を取得
     //
     @GetMapping("/date/{date}")
-    public Activity getByDate(
+    public ActivityRecord getByDate(
             @PathVariable String date
     ) {
 
@@ -97,8 +97,8 @@ public class ActivityController {
     // JSONを受け取ってDB保存
     //
     @PostMapping
-    public Activity add(
-            @RequestBody Activity activity
+    public ActivityRecord add(
+            @RequestBody ActivityRecord activity
     ) {
 
         // =====================

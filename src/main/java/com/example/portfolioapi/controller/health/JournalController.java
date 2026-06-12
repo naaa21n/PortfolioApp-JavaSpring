@@ -8,7 +8,7 @@ package com.example.portfolioapi.controller.health;
 import com.example.portfolioapi.entity.health.Journal;
 
 // Repository
-import com.example.portfolioapi.repository.health.JournalRepository;
+import com.example.portfolioapi.repository.health.JournalEntryRepository;
 
 // Spring MVC
 import org.springframework.web.bind.annotation.*;
@@ -46,14 +46,14 @@ public class JournalController {
     // Repository
     // =========================
 
-    private final JournalRepository journalRepository;
+    private final JournalEntryRepository journalRepository;
 
     // =========================
     // Constructor Injection
     // =========================
 
     public JournalController(
-            JournalRepository journalRepository
+            JournalEntryRepository journalRepository
     ) {
 
         this.journalRepository =

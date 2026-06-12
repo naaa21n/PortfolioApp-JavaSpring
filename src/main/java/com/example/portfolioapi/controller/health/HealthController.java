@@ -5,7 +5,7 @@ package com.example.portfolioapi.controller.health;
 // =========================
 
 import com.example.portfolioapi.entity.health.Health;
-import com.example.portfolioapi.repository.health.HealthRepository;
+import com.example.portfolioapi.repository.health.HealthRecordRepository;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +43,7 @@ public class HealthController {
     //
     // Healthテーブル操作担当
     //
-    private final HealthRepository healthRepository;
+    private final HealthRecordRepository healthRepository;
 
     // =========================
     // Constructor Injection
@@ -52,7 +52,7 @@ public class HealthController {
     // SpringがRepositoryを自動注入
     //
     public HealthController(
-            HealthRepository healthRepository
+            HealthRecordRepository healthRepository
     ) {
         this.healthRepository =
                 healthRepository;

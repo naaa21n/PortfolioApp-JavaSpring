@@ -1,7 +1,33 @@
-package com.example.portfolioapi.entity;
+package com.example.portfolioapi.entity.user;
 
+// 共通カラム用のBaseEntityを継承するため
+import com.example.portfolioapi.entity.common.BaseEntity;
 // JPA(Entity)用
 import jakarta.persistence.*;
+import java.util.UUID;
+
+// =========================
+// BaseEntity 継承
+// =========================
+//
+// BaseEntityを継承することで、
+// Userクラスには直接記載していない以下の共通カラムも
+// usersテーブルに自動で含まれる
+//
+// ・created_at
+// ・updated_at
+//
+// つまり、このUser Entityは実質的に
+//
+// id
+// name
+// email
+// password
+// created_at
+// updated_at
+//
+// のカラムを持つテーブルとして扱われる
+//
 
 // =========================
 // User Entity
@@ -12,24 +38,22 @@ import jakarta.persistence.*;
 
 // user はSQL予約語のため
 // 明示的に "user" テーブル名を指定
-@Table(name = "\"user\"")
-public class User {
+@Table(name = "users")
+public class User extends BaseEntity {
 
     // =========================
     // Primary Key
     // =========================
 
-    // テーブルの主キー
-    @Id
-
-    // ID自動採番
+    // usersテーブルの主キー
     //
-    // PostgreSQLの
-    // SERIAL / IDENTITY 相当
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
-    private Long id;
+    // UUID形式で自動生成
+    //
+    // 例:
+    // 550e8400-e29b-41d4-a716-446655440000
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     // =========================
     // ユーザー名
@@ -63,6 +87,28 @@ public class User {
     // $2a$10$xxxxx...
     private String password;
 
+    // 継承される共通カラム
+    // =========================
+    //
+    // 以下の項目はこのUserクラス内には直接書かない
+    //
+    // private LocalDateTime createdAt;
+    // private LocalDateTime updatedAt;
+    //
+    // これらは BaseEntity から継承される
+    //
+    // createdAt:
+    // 新規登録時に自動設定される
+    //
+    // updatedAt:
+    // 新規登録時・更新時に自動設定される
+    //
+    // そのため、ControllerやServiceで
+    // setCreatedAt(...)
+    // setUpdatedAt(...)
+    // のように手動設定する必要はない
+    //
+
     // =========================
     // Default Constructor
     // =========================
@@ -75,12 +121,12 @@ public class User {
     // =========================
 
     // ID取得
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
     // ID設定
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

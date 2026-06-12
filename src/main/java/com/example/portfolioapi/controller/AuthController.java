@@ -1,10 +1,10 @@
 package com.example.portfolioapi.controller;
 
 // Userエンティティ
-import com.example.portfolioapi.entity.User;
+import com.example.portfolioapi.entity.user.User;
 
 // Userテーブル操作用Repository
-import com.example.portfolioapi.repository.UserRepository;
+import com.example.portfolioapi.repository.user.UserRepository;
 
 // Spring MVC
 import org.springframework.web.bind.annotation.*;

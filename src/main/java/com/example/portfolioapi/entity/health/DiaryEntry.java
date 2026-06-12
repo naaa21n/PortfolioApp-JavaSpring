@@ -1,4 +1,4 @@
-package com.example.portfolioapi.entity.task;
+package com.example.portfolioapi.entity.health;
 
 // =========================
 // Common Entity Import
@@ -21,64 +21,58 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 // =========================
-// Task Entity
+// DiaryEntry Entity
 // =========================
 //
-// タスク情報を管理するEntity
+// 日記データを管理するEntity
 //
 // 対応テーブル
-// tasks
+// diary_entries
 //
 // このクラスの1インスタンスが、
-// tasks テーブルの1行分のデータを表す
+// diary_entries テーブルの1行分のデータを表す
 //
 // 管理項目
 //
 // ・ユーザーID
-// ・タスク名
-// ・タスク日
-// ・締切日
-// ・詳細内容
-// ・完了状態
+// ・日記日付
+// ・日記本文
 //
-// タスク管理ページや
-// ToDo機能で利用する
+// 健康と日記ページの
+// 日記機能で利用する
 //
 @Entity
-@Table(name = "tasks")
+@Table(name = "diary_entries")
 
 // =========================
 // BaseEntity 継承
 // =========================
 //
 // BaseEntityを継承することで、
-// このTaskクラスには直接書いていない
+// このDiaryEntryクラスには直接書いていない
 // 以下の共通カラムも自動で含まれる
 //
 // ・created_at
 // ・updated_at
 //
-// つまり、tasks テーブルは実質的に
+// つまり、diary_entries テーブルは実質的に
 //
 // id
 // user_id
-// title
-// task_date
-// deadline
+// diary_date
 // content
-// completed
 // created_at
 // updated_at
 //
 // のカラムを持つ
 //
-public class Task extends BaseEntity {
+public class DiaryEntry extends BaseEntity {
 
     // =========================
     // Primary Key
     // =========================
     //
-    // tasks テーブルの主キー
+    // diary_entries テーブルの主キー
     //
     // UUID形式で自動生成される
     //
@@ -93,7 +87,7 @@ public class Task extends BaseEntity {
     // User ID
     // =========================
     //
-    // このタスクが
+    // この日記データが
     // どのユーザーに紐づくデータかを表す
     //
     // DBカラム名:
@@ -111,57 +105,28 @@ public class Task extends BaseEntity {
     private UUID userId;
 
     // =========================
-    // Title
+    // Diary Date
     // =========================
     //
-    // タスク名
+    // 日記の日付
     //
     // 例:
-    // "Spring Bootを勉強する"
-    // "ポートフォリオを修正する"
-    //
-    // DBカラム名はJava変数名と同じ title なので
-    // @Column(name = "title") は省略している
-    //
-    private String title;
-
-    // =========================
-    // Task Date
-    // =========================
-    //
-    // タスクを実施する日付
-    //
-    // 例:
-    // 2026-06-12
+    // 2026-05-31
     //
     // Java側:
-    // taskDate
+    // diaryDate
     //
     // DB側:
-    // task_date
+    // diary_date
     //
-    @Column(name = "task_date")
-    private LocalDate taskDate;
-
-    // =========================
-    // Deadline
-    // =========================
-    //
-    // 締切日
-    //
-    // 例:
-    // 2026-06-30
-    //
-    // DBカラム名はJava変数名と同じ deadline なので
-    // @Column(name = "deadline") は省略している
-    //
-    private LocalDate deadline;
+    @Column(name = "diary_date")
+    private LocalDate diaryDate;
 
     // =========================
     // Content
     // =========================
     //
-    // タスクの詳細内容
+    // 日記本文
     //
     // 長文保存用
     //
@@ -172,28 +137,15 @@ public class Task extends BaseEntity {
     private String content;
 
     // =========================
-    // Completed
-    // =========================
-    //
-    // 完了状態
-    //
-    // true  -> 完了
-    // false -> 未完了
-    //
-    // ER図では completed
-    //
-    private boolean completed;
-
-    // =========================
     // Default Constructor
     // =========================
     //
     // JPAがEntityを生成するときに必要
     //
     // DBから取得したデータを
-    // Taskオブジェクトに変換するときなどに使われる
+    // DiaryEntryオブジェクトに変換するときなどに使われる
     //
-    public Task() {
+    public DiaryEntry() {
     }
 
     // =========================
@@ -237,75 +189,30 @@ public class Task extends BaseEntity {
     }
 
     // =========================
-    // Title
+    // Diary Date
     // =========================
 
-    // タスク名取得
-    public String getTitle() {
-        return title;
+    // 日記日付取得
+    public LocalDate getDiaryDate() {
+        return diaryDate;
     }
 
-    // タスク名設定
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    // =========================
-    // Task Date
-    // =========================
-
-    // タスク日取得
-    public LocalDate getTaskDate() {
-        return taskDate;
-    }
-
-    // タスク日設定
-    public void setTaskDate(LocalDate taskDate) {
-        this.taskDate = taskDate;
-    }
-
-    // =========================
-    // Deadline
-    // =========================
-
-    // 締切日取得
-    public LocalDate getDeadline() {
-        return deadline;
-    }
-
-    // 締切日設定
-    public void setDeadline(LocalDate deadline) {
-        this.deadline = deadline;
+    // 日記日付設定
+    public void setDiaryDate(LocalDate diaryDate) {
+        this.diaryDate = diaryDate;
     }
 
     // =========================
     // Content
     // =========================
 
-    // 詳細内容取得
+    // 日記本文取得
     public String getContent() {
         return content;
     }
 
-    // 詳細内容設定
+    // 日記本文設定
     public void setContent(String content) {
         this.content = content;
-    }
-
-    // =========================
-    // Completed
-    // =========================
-
-    // 完了状態取得
-    //
-    // boolean型なので isCompleted 命名
-    //
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    // 完了状態設定
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
     }
 }

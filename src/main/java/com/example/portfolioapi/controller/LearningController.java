@@ -4,7 +4,7 @@ package com.example.portfolioapi.controller;
 import com.example.portfolioapi.entity.Learning;
 
 // Learningテーブル操作用Repository
-import com.example.portfolioapi.repository.LearningRepository;
+import com.example.portfolioapi.repository.learning.LearningRecordRepository;
 
 // Spring MVC
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +28,7 @@ public class LearningController {
     // =========================
 
     // Learningテーブル操作
-    private final LearningRepository learningRepository;
+    private final LearningRecordRepository learningRepository;
 
     // =========================
     // Constructor Injection
@@ -36,7 +36,7 @@ public class LearningController {
 
     // Springが自動でRepositoryを注入
     public LearningController(
-            LearningRepository learningRepository
+            LearningRecordRepository learningRepository
     ) {
 
         this.learningRepository =

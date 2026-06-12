@@ -1,4 +1,4 @@
-package com.example.portfolioapi.entity.task;
+package com.example.portfolioapi.entity.learning;
 
 // =========================
 // Common Entity Import
@@ -21,64 +21,60 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 // =========================
-// Task Entity
+// LearningRecord Entity
 // =========================
 //
-// タスク情報を管理するEntity
+// 学習記録を管理するEntity
 //
 // 対応テーブル
-// tasks
+// learning_records
 //
 // このクラスの1インスタンスが、
-// tasks テーブルの1行分のデータを表す
+// learning_records テーブルの1行分のデータを表す
 //
 // 管理項目
 //
 // ・ユーザーID
-// ・タスク名
-// ・タスク日
-// ・締切日
-// ・詳細内容
-// ・完了状態
+// ・学習タイトル
+// ・学習時間
+// ・学習日
 //
-// タスク管理ページや
-// ToDo機能で利用する
+// 学習管理ページや
+// 学習グラフ機能で利用する
 //
 @Entity
-@Table(name = "tasks")
+@Table(name = "learning_records")
 
 // =========================
 // BaseEntity 継承
 // =========================
 //
 // BaseEntityを継承することで、
-// このTaskクラスには直接書いていない
+// このLearningRecordクラスには直接書いていない
 // 以下の共通カラムも自動で含まれる
 //
 // ・created_at
 // ・updated_at
 //
-// つまり、tasks テーブルは実質的に
+// つまり、learning_records テーブルは実質的に
 //
 // id
 // user_id
 // title
-// task_date
-// deadline
-// content
-// completed
+// study_minutes
+// studied_on
 // created_at
 // updated_at
 //
 // のカラムを持つ
 //
-public class Task extends BaseEntity {
+public class LearningRecord extends BaseEntity {
 
     // =========================
     // Primary Key
     // =========================
     //
-    // tasks テーブルの主キー
+    // learning_records テーブルの主キー
     //
     // UUID形式で自動生成される
     //
@@ -93,7 +89,7 @@ public class Task extends BaseEntity {
     // User ID
     // =========================
     //
-    // このタスクが
+    // この学習記録が
     // どのユーザーに紐づくデータかを表す
     //
     // DBカラム名:
@@ -114,11 +110,12 @@ public class Task extends BaseEntity {
     // Title
     // =========================
     //
-    // タスク名
+    // 学習タイトル
     //
     // 例:
-    // "Spring Bootを勉強する"
-    // "ポートフォリオを修正する"
+    // "Spring Boot"
+    // "英語学習"
+    // "React勉強"
     //
     // DBカラム名はJava変数名と同じ title なので
     // @Column(name = "title") は省略している
@@ -126,63 +123,45 @@ public class Task extends BaseEntity {
     private String title;
 
     // =========================
-    // Task Date
+    // Study Minutes
     // =========================
     //
-    // タスクを実施する日付
+    // 学習時間
+    //
+    // 単位:
+    // 分
+    //
+    // 例:
+    // 30
+    // 60
+    // 120
+    //
+    // Java側:
+    // studyMinutes
+    //
+    // DB側:
+    // study_minutes
+    //
+    @Column(name = "study_minutes")
+    private Integer studyMinutes;
+
+    // =========================
+    // Studied On
+    // =========================
+    //
+    // 学習日
     //
     // 例:
     // 2026-06-12
     //
     // Java側:
-    // taskDate
+    // studiedOn
     //
     // DB側:
-    // task_date
+    // studied_on
     //
-    @Column(name = "task_date")
-    private LocalDate taskDate;
-
-    // =========================
-    // Deadline
-    // =========================
-    //
-    // 締切日
-    //
-    // 例:
-    // 2026-06-30
-    //
-    // DBカラム名はJava変数名と同じ deadline なので
-    // @Column(name = "deadline") は省略している
-    //
-    private LocalDate deadline;
-
-    // =========================
-    // Content
-    // =========================
-    //
-    // タスクの詳細内容
-    //
-    // 長文保存用
-    //
-    // DB型:
-    // text
-    //
-    @Column(columnDefinition = "TEXT")
-    private String content;
-
-    // =========================
-    // Completed
-    // =========================
-    //
-    // 完了状態
-    //
-    // true  -> 完了
-    // false -> 未完了
-    //
-    // ER図では completed
-    //
-    private boolean completed;
+    @Column(name = "studied_on")
+    private LocalDate studiedOn;
 
     // =========================
     // Default Constructor
@@ -191,9 +170,9 @@ public class Task extends BaseEntity {
     // JPAがEntityを生成するときに必要
     //
     // DBから取得したデータを
-    // Taskオブジェクトに変換するときなどに使われる
+    // LearningRecordオブジェクトに変換するときなどに使われる
     //
-    public Task() {
+    public LearningRecord() {
     }
 
     // =========================
@@ -240,72 +219,41 @@ public class Task extends BaseEntity {
     // Title
     // =========================
 
-    // タスク名取得
+    // 学習タイトル取得
     public String getTitle() {
         return title;
     }
 
-    // タスク名設定
+    // 学習タイトル設定
     public void setTitle(String title) {
         this.title = title;
     }
 
     // =========================
-    // Task Date
+    // Study Minutes
     // =========================
 
-    // タスク日取得
-    public LocalDate getTaskDate() {
-        return taskDate;
+    // 学習時間取得
+    public Integer getStudyMinutes() {
+        return studyMinutes;
     }
 
-    // タスク日設定
-    public void setTaskDate(LocalDate taskDate) {
-        this.taskDate = taskDate;
-    }
-
-    // =========================
-    // Deadline
-    // =========================
-
-    // 締切日取得
-    public LocalDate getDeadline() {
-        return deadline;
-    }
-
-    // 締切日設定
-    public void setDeadline(LocalDate deadline) {
-        this.deadline = deadline;
+    // 学習時間設定
+    public void setStudyMinutes(Integer studyMinutes) {
+        this.studyMinutes = studyMinutes;
     }
 
     // =========================
-    // Content
+    // Studied On
     // =========================
 
-    // 詳細内容取得
-    public String getContent() {
-        return content;
+    // 学習日取得
+    public LocalDate getStudiedOn() {
+        return studiedOn;
     }
 
-    // 詳細内容設定
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    // =========================
-    // Completed
-    // =========================
-
-    // 完了状態取得
-    //
-    // boolean型なので isCompleted 命名
-    //
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    // 完了状態設定
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
+    // 学習日設定
+    public void setStudiedOn(LocalDate studiedOn) {
+        this.studiedOn = studiedOn;
     }
 }
