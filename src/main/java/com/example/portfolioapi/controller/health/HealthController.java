@@ -1,244 +1,533 @@
 package com.example.portfolioapi.controller.health;
 
 // =========================
-// Import
+// Entity Import
 // =========================
 
-import com.example.portfolioapi.entity.health.Health;
+import com.example.portfolioapi.entity.health.HealthRecord;
+import com.example.portfolioapi.entity.health.ActivityRecord;
+import com.example.portfolioapi.entity.health.DiaryEntry;
+import com.example.portfolioapi.entity.health.JournalEntry;
+
+// =========================
+// Repository Import
+// =========================
+
 import com.example.portfolioapi.repository.health.HealthRecordRepository;
+import com.example.portfolioapi.repository.health.ActivityRecordRepository;
+import com.example.portfolioapi.repository.health.DiaryEntryRepository;
+import com.example.portfolioapi.repository.health.JournalEntryRepository;
+
+// =========================
+// Spring MVC Import
+// =========================
 
 import org.springframework.web.bind.annotation.*;
+
+// =========================
+// Java Import
+// =========================
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 // =========================
 // Health Controller
 // =========================
 //
-// 健康データを管理する
-// REST API Controller
+// 健康ページで使用するAPI Controller
 //
-// URL
-// GET    /api/healths
-// GET    /api/healths/month
-// GET    /api/healths/date/{date}
-// GET    /api/healths/{id}
-// POST   /api/healths
-// PUT    /api/healths/{id}
-// DELETE /api/healths/{id}
+// このControllerでは以下の4種類のデータを扱う
+//
+// ・health_records
+// ・activity_records
+// ・diary_entries
+// ・journal_entries
+//
+// URL共通部分:
+//
+// /api/health
 //
 @RestController
+@RequestMapping("/api/health")
 
-// API共通URL
-@RequestMapping("/api/healths")
-
-// Next.jsからアクセス許可
+// Next.jsが別ポートで動く場合に必要になることがある
+// 例:
+// @CrossOrigin(origins = "http://localhost:3000")
 public class HealthController {
 
     // =========================
     // Repository
     // =========================
-    //
-    // Healthテーブル操作担当
-    //
-    private final HealthRecordRepository healthRepository;
+
+    // 健康記録テーブル操作用Repository
+    private final HealthRecordRepository healthRecordRepository;
+
+    // 活動記録テーブル操作用Repository
+    private final ActivityRecordRepository activityRecordRepository;
+
+    // 日記テーブル操作用Repository
+    private final DiaryEntryRepository diaryEntryRepository;
+
+    // ジャーナリングテーブル操作用Repository
+    private final JournalEntryRepository journalEntryRepository;
 
     // =========================
     // Constructor Injection
     // =========================
     //
-    // SpringがRepositoryを自動注入
+    // Springが自動でRepositoryを注入する
     //
     public HealthController(
-            HealthRecordRepository healthRepository
+            HealthRecordRepository healthRecordRepository,
+            ActivityRecordRepository activityRecordRepository,
+            DiaryEntryRepository diaryEntryRepository,
+            JournalEntryRepository journalEntryRepository
     ) {
-        this.healthRepository =
-                healthRepository;
+        this.healthRecordRepository = healthRecordRepository;
+        this.activityRecordRepository = activityRecordRepository;
+        this.diaryEntryRepository = diaryEntryRepository;
+        this.journalEntryRepository = journalEntryRepository;
+    }
+
+    // ============================================================
+    // HealthRecord API
+    // ============================================================
+
+    // =========================
+    // 健康記録一覧取得
+    // =========================
+    //
+    // GET:
+    // /api/health/records
+    //
+    @GetMapping("/records")
+    public List<HealthRecord> getHealthRecords() {
+
+        // 注意:
+        // 現時点では全ユーザーの健康記録を返す
+        // JWT導入後は userId で絞り込む必要がある
+        return healthRecordRepository.findAll();
     }
 
     // =========================
-    // 全件取得
+    // 健康記録 日付検索
     // =========================
     //
-    // GET
-    // /api/healths
+    // GET:
+    // /api/health/records/date/2026-06-13
     //
-    // 健康データ一覧取得
-    //
-    @GetMapping
-    public List<Health> getHealths() {
-
-        return healthRepository.findAll();
-    }
-
-    // =========================
-    // 月データ取得
-    // =========================
-    //
-    // GET
-    // /api/healths/month
-    //
-    // 月別データ取得
-    //
-    @GetMapping("/month")
-    public List<Health> getMonthHealths() {
-
-        return healthRepository.findAll();
-    }
-
-    // =========================
-    // 日付検索
-    // =========================
-    //
-    // GET
-    // /api/healths/date/{date}
-    //
-    // 指定日付の健康データ取得
-    //
-    @GetMapping("/date/{date}")
-    public Health getByDate(
+    @GetMapping("/records/date/{date}")
+    public HealthRecord getHealthRecordByDate(
             @PathVariable String date
     ) {
-
-        return healthRepository
-                .findByDate(
-                        LocalDate.parse(date)
-                )
+        return healthRecordRepository
+                .findByRecordDate(LocalDate.parse(date))
                 .orElse(null);
     }
 
     // =========================
-    // 1件取得
+    // 健康記録 1件取得
     // =========================
     //
-    // GET
-    // /api/healths/{id}
+    // GET:
+    // /api/health/records/{id}
     //
-    // IDで健康データ取得
-    //
-    @GetMapping("/{id}")
-    public Health getHealth(
-            @PathVariable String id
+    @GetMapping("/records/{id}")
+    public HealthRecord getHealthRecord(
+            @PathVariable UUID id
     ) {
-
-        return healthRepository
+        return healthRecordRepository
                 .findById(id)
                 .orElse(null);
     }
 
     // =========================
-    // 新規登録
+    // 健康記録 新規登録
     // =========================
     //
-    // POST
-    // /api/healths
+    // POST:
+    // /api/health/records
     //
-    // 健康データ保存
-    //
-    @PostMapping
-    public Health addHealth(
-            @RequestBody Health health
+    @PostMapping("/records")
+    public HealthRecord addHealthRecord(
+            @RequestBody HealthRecord healthRecord
     ) {
-
-        // =====================
-        // デバッグ確認
-        // =====================
-
-        System.out.println(
-                "date=" + health.getDate()
-        );
-
-        System.out.println(
-                "steps=" + health.getSteps()
-        );
-
-        System.out.println(
-                "exerciseMinutes="
-                        + health.getExerciseMinutes()
-        );
-
-        System.out.println(
-                "sleepHours="
-                        + health.getSleepHours()
-        );
-
-        System.out.println(
-                "waterMl="
-                        + health.getWaterMl()
-        );
-
-        // =====================
-        // DB保存
-        // =====================
-
-        return healthRepository.save(
-                health
-        );
+        return healthRecordRepository.save(healthRecord);
     }
 
     // =========================
-    // 更新
+    // 健康記録 更新
     // =========================
     //
-    // PUT
-    // /api/healths/{id}
+    // PUT:
+    // /api/health/records/{id}
     //
-    // 健康データ更新
-    //
-    @PutMapping("/{id}")
-    public Health updateHealth(
-            @PathVariable String id,
-            @RequestBody Health request
+    @PutMapping("/records/{id}")
+    public HealthRecord updateHealthRecord(
+            @PathVariable UUID id,
+            @RequestBody HealthRecord request
     ) {
+        Optional<HealthRecord> optional =
+                healthRecordRepository.findById(id);
 
-        Optional<Health> optional =
-                healthRepository.findById(id);
-
-        // データなし
         if (optional.isEmpty()) {
             return null;
         }
 
-        Health health =
-                optional.get();
+        HealthRecord healthRecord = optional.get();
 
-        // 更新内容反映
+        healthRecord.setRecordDate(request.getRecordDate());
+        healthRecord.setSteps(request.getSteps());
+        healthRecord.setExerciseMinutes(request.getExerciseMinutes());
+        healthRecord.setSleepHours(request.getSleepHours());
+        healthRecord.setWaterMl(request.getWaterMl());
 
-        health.setSteps(
-                request.getSteps());
-
-        health.setExerciseMinutes(
-                request.getExerciseMinutes());
-
-        health.setSleepHours(
-                request.getSleepHours());
-
-        health.setWaterMl(
-                request.getWaterMl());
-
-        // 更新保存
-
-        return healthRepository.save(
-                health
-        );
+        return healthRecordRepository.save(healthRecord);
     }
 
     // =========================
-    // 削除
+    // 健康記録 削除
     // =========================
     //
-    // DELETE
-    // /api/healths/{id}
+    // DELETE:
+    // /api/health/records/{id}
     //
-    // 指定IDの健康データ削除
-    //
-    @DeleteMapping("/{id}")
-    public void deleteHealth(
-            @PathVariable String id
+    @DeleteMapping("/records/{id}")
+    public void deleteHealthRecord(
+            @PathVariable UUID id
     ) {
+        healthRecordRepository.deleteById(id);
+    }
 
-        healthRepository.deleteById(id);
+    // ============================================================
+    // ActivityRecord API
+    // ============================================================
+
+    // =========================
+    // 活動記録一覧取得
+    // =========================
+    //
+    // GET:
+    // /api/health/activities
+    //
+    @GetMapping("/activities")
+    public List<ActivityRecord> getActivityRecords() {
+
+        // 注意:
+        // 現時点では全ユーザーの活動記録を返す
+        // JWT導入後は userId で絞り込む必要がある
+        return activityRecordRepository.findAll();
+    }
+
+    // =========================
+    // 活動記録 日付検索
+    // =========================
+    //
+    // GET:
+    // /api/health/activities/date/2026-06-13
+    //
+    @GetMapping("/activities/date/{date}")
+    public ActivityRecord getActivityRecordByDate(
+            @PathVariable String date
+    ) {
+        return activityRecordRepository
+                .findByRecordDate(LocalDate.parse(date))
+                .orElse(null);
+    }
+
+    // =========================
+    // 活動記録 1件取得
+    // =========================
+    //
+    // GET:
+    // /api/health/activities/{id}
+    //
+    @GetMapping("/activities/{id}")
+    public ActivityRecord getActivityRecord(
+            @PathVariable UUID id
+    ) {
+        return activityRecordRepository
+                .findById(id)
+                .orElse(null);
+    }
+
+    // =========================
+    // 活動記録 新規登録
+    // =========================
+    //
+    // POST:
+    // /api/health/activities
+    //
+    @PostMapping("/activities")
+    public ActivityRecord addActivityRecord(
+            @RequestBody ActivityRecord activityRecord
+    ) {
+        return activityRecordRepository.save(activityRecord);
+    }
+
+    // =========================
+    // 活動記録 更新
+    // =========================
+    //
+    // PUT:
+    // /api/health/activities/{id}
+    //
+    @PutMapping("/activities/{id}")
+    public ActivityRecord updateActivityRecord(
+            @PathVariable UUID id,
+            @RequestBody ActivityRecord request
+    ) {
+        Optional<ActivityRecord> optional =
+                activityRecordRepository.findById(id);
+
+        if (optional.isEmpty()) {
+            return null;
+        }
+
+        ActivityRecord activityRecord = optional.get();
+
+        activityRecord.setRecordDate(request.getRecordDate());
+        activityRecord.setSleep(request.getSleep());
+        activityRecord.setWork(request.getWork());
+        activityRecord.setStudy(request.getStudy());
+        activityRecord.setExercise(request.getExercise());
+        activityRecord.setHobby(request.getHobby());
+        activityRecord.setOther(request.getOther());
+
+        return activityRecordRepository.save(activityRecord);
+    }
+
+    // =========================
+    // 活動記録 削除
+    // =========================
+    //
+    // DELETE:
+    // /api/health/activities/{id}
+    //
+    @DeleteMapping("/activities/{id}")
+    public void deleteActivityRecord(
+            @PathVariable UUID id
+    ) {
+        activityRecordRepository.deleteById(id);
+    }
+
+    // ============================================================
+    // DiaryEntry API
+    // ============================================================
+
+    // =========================
+    // 日記一覧取得
+    // =========================
+    //
+    // GET:
+    // /api/health/diaries
+    //
+    @GetMapping("/diaries")
+    public List<DiaryEntry> getDiaryEntries() {
+
+        // 注意:
+        // 現時点では全ユーザーの日記を返す
+        // JWT導入後は userId で絞り込む必要がある
+        return diaryEntryRepository.findAll();
+    }
+
+    // =========================
+    // 日記 日付検索
+    // =========================
+    //
+    // GET:
+    // /api/health/diaries/date/2026-06-13
+    //
+    @GetMapping("/diaries/date/{date}")
+    public DiaryEntry getDiaryEntryByDate(
+            @PathVariable String date
+    ) {
+        return diaryEntryRepository
+                .findByDiaryDate(LocalDate.parse(date))
+                .orElse(null);
+    }
+
+    // =========================
+    // 日記 1件取得
+    // =========================
+    //
+    // GET:
+    // /api/health/diaries/{id}
+    //
+    @GetMapping("/diaries/{id}")
+    public DiaryEntry getDiaryEntry(
+            @PathVariable UUID id
+    ) {
+        return diaryEntryRepository
+                .findById(id)
+                .orElse(null);
+    }
+
+    // =========================
+    // 日記 新規登録
+    // =========================
+    //
+    // POST:
+    // /api/health/diaries
+    //
+    @PostMapping("/diaries")
+    public DiaryEntry addDiaryEntry(
+            @RequestBody DiaryEntry diaryEntry
+    ) {
+        return diaryEntryRepository.save(diaryEntry);
+    }
+
+    // =========================
+    // 日記 更新
+    // =========================
+    //
+    // PUT:
+    // /api/health/diaries/{id}
+    //
+    @PutMapping("/diaries/{id}")
+    public DiaryEntry updateDiaryEntry(
+            @PathVariable UUID id,
+            @RequestBody DiaryEntry request
+    ) {
+        Optional<DiaryEntry> optional =
+                diaryEntryRepository.findById(id);
+
+        if (optional.isEmpty()) {
+            return null;
+        }
+
+        DiaryEntry diaryEntry = optional.get();
+
+        diaryEntry.setDiaryDate(request.getDiaryDate());
+        diaryEntry.setContent(request.getContent());
+
+        return diaryEntryRepository.save(diaryEntry);
+    }
+
+    // =========================
+    // 日記 削除
+    // =========================
+    //
+    // DELETE:
+    // /api/health/diaries/{id}
+    //
+    @DeleteMapping("/diaries/{id}")
+    public void deleteDiaryEntry(
+            @PathVariable UUID id
+    ) {
+        diaryEntryRepository.deleteById(id);
+    }
+
+    // ============================================================
+    // JournalEntry API
+    // ============================================================
+
+    // =========================
+    // ジャーナル一覧取得
+    // =========================
+    //
+    // GET:
+    // /api/health/journals
+    //
+    @GetMapping("/journals")
+    public List<JournalEntry> getJournalEntries() {
+
+        // 注意:
+        // 現時点では全ユーザーのジャーナルを返す
+        // JWT導入後は userId で絞り込む必要がある
+        return journalEntryRepository.findAll();
+    }
+
+    // =========================
+    // ジャーナル 日付検索
+    // =========================
+    //
+    // GET:
+    // /api/health/journals/date/2026-06-13
+    //
+    @GetMapping("/journals/date/{date}")
+    public JournalEntry getJournalEntryByDate(
+            @PathVariable String date
+    ) {
+        return journalEntryRepository
+                .findByJournalDate(LocalDate.parse(date))
+                .orElse(null);
+    }
+
+    // =========================
+    // ジャーナル 1件取得
+    // =========================
+    //
+    // GET:
+    // /api/health/journals/{id}
+    //
+    @GetMapping("/journals/{id}")
+    public JournalEntry getJournalEntry(
+            @PathVariable UUID id
+    ) {
+        return journalEntryRepository
+                .findById(id)
+                .orElse(null);
+    }
+
+    // =========================
+    // ジャーナル 新規登録
+    // =========================
+    //
+    // POST:
+    // /api/health/journals
+    //
+    @PostMapping("/journals")
+    public JournalEntry addJournalEntry(
+            @RequestBody JournalEntry journalEntry
+    ) {
+        return journalEntryRepository.save(journalEntry);
+    }
+
+    // =========================
+    // ジャーナル 更新
+    // =========================
+    //
+    // PUT:
+    // /api/health/journals/{id}
+    //
+    @PutMapping("/journals/{id}")
+    public JournalEntry updateJournalEntry(
+            @PathVariable UUID id,
+            @RequestBody JournalEntry request
+    ) {
+        Optional<JournalEntry> optional =
+                journalEntryRepository.findById(id);
+
+        if (optional.isEmpty()) {
+            return null;
+        }
+
+        JournalEntry journalEntry = optional.get();
+
+        journalEntry.setJournalDate(request.getJournalDate());
+        journalEntry.setGratitude(request.getGratitude());
+        journalEntry.setAchievement(request.getAchievement());
+        journalEntry.setTomorrowGoal(request.getTomorrowGoal());
+        journalEntry.setFreeText(request.getFreeText());
+
+        return journalEntryRepository.save(journalEntry);
+    }
+
+    // =========================
+    // ジャーナル 削除
+    // =========================
+    //
+    // DELETE:
+    // /api/health/journals/{id}
+    //
+    @DeleteMapping("/journals/{id}")
+    public void deleteJournalEntry(
+            @PathVariable UUID id
+    ) {
+        journalEntryRepository.deleteById(id);
     }
 }
