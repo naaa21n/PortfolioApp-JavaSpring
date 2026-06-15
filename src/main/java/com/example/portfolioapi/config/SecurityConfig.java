@@ -1,40 +1,134 @@
 package com.example.portfolioapi.config;
 
-// Springの設定クラスであることを示す
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// Spring Security の設定用
+import org.springframework.http.HttpMethod;
+
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
-// パスワードを BCrypt でハッシュ化するためのクラス
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-// Security のFilter設定
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+
 import org.springframework.security.web.SecurityFilterChain;
 
-// このクラスが設定クラスであることをSpringへ伝える
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import java.util.Base64;
+
 @Configuration
 public class SecurityConfig {
+
+    // application.propertiesの
+    // app.jwt.secretを取得
+    @Value("${app.jwt.secret}")
+    private String jwtSecretBase64;
+
+    // JWTの発行元
+    @Value("${app.jwt.issuer}")
+    private String jwtIssuer;
 
     // =========================
     // PasswordEncoder設定
     // =========================
 
-    // パスワードをハッシュ化するためのBean
-    // Spring全体で使い回される
     @Bean
     public PasswordEncoder passwordEncoder() {
 
-        // BCrypt方式でハッシュ化
-        // register時:
-        // passwordEncoder.encode(password)
+        // 現在使用しているBCryptをそのまま継続
         //
-        // login時:
-        // passwordEncoder.matches(raw, hashed)
+        // 登録時:
+        // passwordEncoder.encode(rawPassword)
+        //
+        // ログイン時:
+        // passwordEncoder.matches(
+        //     rawPassword,
+        //     hashedPassword
+        // )
         return new BCryptPasswordEncoder();
+    }
+
+    // =========================
+    // JWT署名用秘密鍵
+    // =========================
+
+    @Bean
+    public SecretKey jwtSecretKey() {
+
+        // Base64形式の環境変数を
+        // バイトデータへ戻す
+        byte[] decodedKey = Base64
+                .getDecoder()
+                .decode(jwtSecretBase64.trim());
+
+        // HS256では最低256bit、
+        // つまり32byte以上の鍵を使用する
+        if (decodedKey.length < 32) {
+            throw new IllegalStateException(
+                    "JWT秘密鍵は32byte以上必要です"
+            );
+        }
+
+        return new SecretKeySpec(
+                decodedKey,
+                "HmacSHA256"
+        );
+    }
+
+    // =========================
+    // JWT発行設定
+    // =========================
+
+    @Bean
+    public JwtEncoder jwtEncoder(
+            SecretKey jwtSecretKey
+    ) {
+
+        // JwtTokenServiceでJWTを作るときに使用
+        return new NimbusJwtEncoder(
+                new ImmutableSecret<>(jwtSecretKey)
+        );
+    }
+
+    // =========================
+    // JWT検証設定
+    // =========================
+
+    @Bean
+    public JwtDecoder jwtDecoder(
+            SecretKey jwtSecretKey
+    ) {
+
+        // Authorization: Bearer JWT
+        // で受け取ったJWTを検証する
+        NimbusJwtDecoder jwtDecoder =
+                NimbusJwtDecoder
+                        .withSecretKey(jwtSecretKey)
+                        .macAlgorithm(MacAlgorithm.HS256)
+                        .build();
+
+        // issuerがportfolio-apiであるかも検証する
+        jwtDecoder.setJwtValidator(
+                JwtValidators.createDefaultWithIssuer(
+                        jwtIssuer
+                )
+        );
+
+        return jwtDecoder;
     }
 
     // =========================
@@ -48,46 +142,69 @@ public class SecurityConfig {
 
         http
 
-                // CSRF保護を無効化
-                //
-                // 今回は Next.js と Spring Boot を
-                // API通信で使っているためOFFにしている
-                //
-                // JWT認証構成ではよく disable する
+                // Next.jsからAuthorizationヘッダーで
+                // JWTを送るAPI構成なのでCSRFを無効化
                 .csrf(csrf -> csrf.disable())
 
-                // リクエストごとのアクセス制御
-                .authorizeHttpRequests(auth -> auth
+                // CORS設定を有効化
+                // 詳細な許可URLは別途設定可能
+                .cors(Customizer.withDefaults())
 
-                        // 現在は全APIを許可
-                        //
-                        // 例:
-                        // /api/auth/login
-                        // /api/tasks
-                        // など全部アクセス可能
-                        //
-                        // 後でJWT認証を導入したら:
-                        //
-                        // .requestMatchers("/api/auth/**").permitAll()
-                        // .anyRequest().authenticated()
-                        //
-                        // に変更する
-                        .anyRequest().permitAll()
+                // JWTはSpringのHTTP Sessionを使わない
+                //
+                // リクエストごとにJWTを確認する
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
                 )
 
-                // Basic認証設定
-                //
-                // 現状は特に使っていないが、
-                // Spring Security初期設定として追加
-                .httpBasic(Customizer.withDefaults());
+                // URLごとのアクセス制御
+                .authorizeHttpRequests(auth -> auth
 
-        // Security設定をSpringへ返す
+                        // プリフライトリクエストを許可
+                        .requestMatchers(
+                                HttpMethod.OPTIONS,
+                                "/**"
+                        )
+                        .permitAll()
+
+                        // ユーザー登録は未ログインでも許可
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/register"
+                        )
+                        .permitAll()
+
+                        // ログインは未ログインでも許可
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/login"
+                        )
+                        .permitAll()
+
+                        // 上記以外のAPIはJWT必須
+                        .anyRequest()
+                        .authenticated()
+                )
+
+                // Basic認証は使用しない
+                .httpBasic(
+                        AbstractHttpConfigurer::disable
+                )
+
+                // Spring標準ログイン画面は使用しない
+                .formLogin(
+                        AbstractHttpConfigurer::disable
+                )
+
+                // Bearer JWT認証を有効化
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(
+                                Customizer.withDefaults()
+                        )
+                );
+
         return http.build();
     }
 }
-
-//git管理OK
-//「アプリのセキュリティルールを決めるファイル」
-//・ログイン必要？
-//・どのAPIを公開する？
-//・パスワードどう暗号化する？
