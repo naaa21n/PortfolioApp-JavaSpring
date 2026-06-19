@@ -22,6 +22,8 @@ import com.example.portfolioapi.repository.health.JournalEntryRepository;
 // Spring MVC Import
 // =========================
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 // =========================
@@ -104,12 +106,16 @@ public class HealthController {
     // /api/health/records
     //
     @GetMapping("/records")
-    public List<HealthRecord> getHealthRecords() {
+    public List<HealthRecord> getHealthRecords(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
 
-        // 注意:
-        // 現時点では全ユーザーの健康記録を返す
-        // JWT導入後は userId で絞り込む必要がある
-        return healthRecordRepository.findAll();
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        // userIdで絞り込み表示する
+        // WHERE userId = ? 指定と同じ
+        return healthRecordRepository.findByUserId(userId);
     }
 
     // =========================
@@ -153,9 +159,17 @@ public class HealthController {
     //
     @PostMapping("/records")
     public HealthRecord addHealthRecord(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody HealthRecord healthRecord
     ) {
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+        healthRecord.setUserId(userId);
+
+        // テーブルへ保存処理
         return healthRecordRepository.save(healthRecord);
+
+        //healthRecordRepository.findByUserId(userId);
     }
 
     // =========================
@@ -214,12 +228,16 @@ public class HealthController {
     // /api/health/activities
     //
     @GetMapping("/activities")
-    public List<ActivityRecord> getActivityRecords() {
+    public List<ActivityRecord> getActivityRecords(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
 
-        // 注意:
-        // 現時点では全ユーザーの活動記録を返す
-        // JWT導入後は userId で絞り込む必要がある
-        return activityRecordRepository.findAll();
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        // userIdで絞り込み表示する
+        // WHERE userId = ? 指定と同じ
+        return activityRecordRepository.findByUserId(userId);
     }
 
     // =========================
@@ -263,8 +281,14 @@ public class HealthController {
     //
     @PostMapping("/activities")
     public ActivityRecord addActivityRecord(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody ActivityRecord activityRecord
     ) {
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+        activityRecord.setUserId(userId);
+
+        // テーブルへ保存処理
         return activityRecordRepository.save(activityRecord);
     }
 
@@ -326,12 +350,16 @@ public class HealthController {
     // /api/health/diaries
     //
     @GetMapping("/diaries")
-    public List<DiaryEntry> getDiaryEntries() {
+    public List<DiaryEntry> getDiaryEntries(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
 
-        // 注意:
-        // 現時点では全ユーザーの日記を返す
-        // JWT導入後は userId で絞り込む必要がある
-        return diaryEntryRepository.findAll();
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        // userIdで絞り込み表示する
+        // WHERE userId = ? 指定と同じ
+        return diaryEntryRepository.findByUserId(userId);
     }
 
     // =========================
@@ -343,10 +371,16 @@ public class HealthController {
     //
     @GetMapping("/diaries/date/{date}")
     public DiaryEntry getDiaryEntryByDate(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable String date
     ) {
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        // WHERE diary_date = ? AND user_id = ?
+        // 該当情報が無ければNULLを返却
         return diaryEntryRepository
-                .findByDiaryDate(LocalDate.parse(date))
+                .findByDiaryDateAndUserId(LocalDate.parse(date),userId)
                 .orElse(null);
     }
 
@@ -375,8 +409,14 @@ public class HealthController {
     //
     @PostMapping("/diaries")
     public DiaryEntry addDiaryEntry(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody DiaryEntry diaryEntry
     ) {
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+        diaryEntry.setUserId(userId);
+
+        // テーブルへ保存処理
         return diaryEntryRepository.save(diaryEntry);
     }
 
@@ -416,8 +456,12 @@ public class HealthController {
     //
     @DeleteMapping("/diaries/{id}")
     public void deleteDiaryEntry(
+            //@AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID id
     ) {
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        // UUID userId = UUID.fromString(jwt.getSubject());
+
         diaryEntryRepository.deleteById(id);
     }
 
@@ -433,12 +477,16 @@ public class HealthController {
     // /api/health/journals
     //
     @GetMapping("/journals")
-    public List<JournalEntry> getJournalEntries() {
+    public List<JournalEntry> getJournalEntries(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
 
-        // 注意:
-        // 現時点では全ユーザーのジャーナルを返す
-        // JWT導入後は userId で絞り込む必要がある
-        return journalEntryRepository.findAll();
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        // userIdで絞り込み表示する
+        // WHERE userId = ? 指定と同じ
+        return journalEntryRepository.findByUserId(userId);
     }
 
     // =========================
@@ -482,8 +530,14 @@ public class HealthController {
     //
     @PostMapping("/journals")
     public JournalEntry addJournalEntry(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody JournalEntry journalEntry
     ) {
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+        journalEntry.setUserId(userId);
+
+        // テーブルへ保存処理
         return journalEntryRepository.save(journalEntry);
     }
 

@@ -11,6 +11,12 @@ import com.example.portfolioapi.entity.task.Task;
 import com.example.portfolioapi.entity.task.Memo;
 
 // =========================
+// JWT Import
+// =========================
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+
+// =========================
 // Repository Import
 // =========================
 
@@ -104,12 +110,16 @@ public class TaskController {
     // /api/tasks
     //
     @GetMapping("/tasks")
-    public List<Task> getTasks() {
+    public List<Task> getTasks(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
 
-        // 注意:
-        // 現時点では全ユーザーのタスクを返す
-        // JWT導入後は userId で絞り込む必要がある
-        return taskRepository.findAll();
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        // userIdで絞り込み表示する
+        // WHERE userId = ? 指定と同じ
+        return taskRepository.findByUserId(userId);
     }
 
     // =========================
@@ -137,8 +147,13 @@ public class TaskController {
     //
     @PostMapping("/tasks")
     public List<Task> addTask(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody Task task
     ) {
+
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+        task.setUserId(userId);
 
         // JSONデータをDB保存
         //
@@ -146,8 +161,8 @@ public class TaskController {
         // INSERT INTO tasks ...
         taskRepository.save(task);
 
-        // 保存後一覧返却
-        return taskRepository.findAll();
+        // 保存後にタスク一覧返却(ユーザー指定)
+        return taskRepository.findByUserId(userId);
     }
 
     // =========================
@@ -190,8 +205,12 @@ public class TaskController {
     //
     @DeleteMapping("/tasks/{id}")
     public List<Task> deleteTask(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID id
     ) {
+
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
 
         // 指定ID削除
         //
@@ -200,8 +219,8 @@ public class TaskController {
         // WHERE id = ?
         taskRepository.deleteById(id);
 
-        // 削除後一覧返却
-        return taskRepository.findAll();
+        // 削除後にタスク一覧返却(ユーザー指定)
+        return taskRepository.findByUserId(userId);
     }
 
     // =========================
@@ -213,8 +232,12 @@ public class TaskController {
     //
     @PutMapping("/tasks/{id}/done")
     public List<Task> completeTask(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID id
     ) {
+
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
 
         // IDでtask検索
         //
@@ -237,8 +260,8 @@ public class TaskController {
         // WHERE id = ?
         taskRepository.save(task);
 
-        // 更新後一覧返却
-        return taskRepository.findAll();
+        // 完了後にタスク一覧返却(ユーザー指定)
+        return taskRepository.findByUserId(userId);
     }
 
     // =========================
@@ -277,12 +300,15 @@ public class TaskController {
     // /api/memos
     //
     @GetMapping("/memos")
-    public List<Memo> getMemos() {
+    public List<Memo> getMemos(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
 
-        // 注意:
-        // 現時点では全ユーザーのメモを返す
-        // JWT導入後は userId で絞り込む必要がある
-        return memoRepository.findAll();
+        // userIdで絞り込み表示する
+        // WHERE userId = ? 指定と同じ
+        return memoRepository.findByUserId(userId);
     }
 
     // =========================
@@ -310,8 +336,13 @@ public class TaskController {
     //
     @PostMapping("/memos")
     public List<Memo> addMemo(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody Memo memo
     ) {
+
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+        memo.setUserId(userId);
 
         // JSONデータをDB保存
         //
@@ -320,7 +351,7 @@ public class TaskController {
         memoRepository.save(memo);
 
         // 保存後一覧返却
-        return memoRepository.findAll();
+        return memoRepository.findByUserId(userId);
     }
 
     // =========================
@@ -360,8 +391,12 @@ public class TaskController {
     //
     @DeleteMapping("/memos/{id}")
     public List<Memo> deleteMemo(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID id
     ) {
+
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
 
         // 指定ID削除
         //
@@ -371,6 +406,6 @@ public class TaskController {
         memoRepository.deleteById(id);
 
         // 削除後一覧返却
-        return memoRepository.findAll();
+        return memoRepository.findByUserId(userId);
     }
 }

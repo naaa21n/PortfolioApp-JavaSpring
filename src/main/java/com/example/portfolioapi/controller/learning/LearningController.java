@@ -24,6 +24,8 @@ import com.example.portfolioapi.repository.learning.ReadingRecordRepository;
 // Spring MVC Import
 // =========================
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 // =========================
@@ -95,17 +97,16 @@ public class LearningController {
     // /api/learning/records
     //
     @GetMapping("/records")
-    public List<LearningRecord> getLearningRecords() {
+    public List<LearningRecord> getLearningRecords(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
 
-        // learning_records テーブル全件取得
-        //
-        // SQLイメージ:
-        // SELECT * FROM learning_records;
-        //
-        // 注意:
-        // 現時点では全ユーザーの学習記録を返す
-        // JWT導入後は userId で絞り込む必要がある
-        return learningRecordRepository.findAll();
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        // userIdで絞り込み表示する
+        // WHERE userId = ? 指定と同じ
+        return learningRecordRepository.findByUserId(userId);
     }
 
     // =========================
@@ -117,8 +118,13 @@ public class LearningController {
     //
     @PostMapping("/records")
     public List<LearningRecord> addLearningRecord(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody LearningRecord learningRecord
     ) {
+
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+        learningRecord.setUserId(userId);
 
         // JSONデータをDB保存
         //
@@ -127,7 +133,7 @@ public class LearningController {
         learningRecordRepository.save(learningRecord);
 
         // 保存後の一覧返却
-        return learningRecordRepository.findAll();
+        return learningRecordRepository.findByUserId(userId);
     }
 
     // =========================
@@ -142,8 +148,12 @@ public class LearningController {
     //
     @DeleteMapping("/records/{id}")
     public List<LearningRecord> deleteLearningRecord(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID id
     ) {
+
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
 
         // 指定IDの学習記録を削除
         //
@@ -153,7 +163,7 @@ public class LearningController {
         learningRecordRepository.deleteById(id);
 
         // 削除後の一覧返却
-        return learningRecordRepository.findAll();
+        return learningRecordRepository.findByUserId(userId);
     }
 
     // ============================================================
@@ -168,17 +178,16 @@ public class LearningController {
     // /api/learning/readings
     //
     @GetMapping("/readings")
-    public List<ReadingRecord> getReadingRecords() {
+    public List<ReadingRecord> getReadingRecords(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
 
-        // reading_records テーブル全件取得
-        //
-        // SQLイメージ:
-        // SELECT * FROM reading_records;
-        //
-        // 注意:
-        // 現時点では全ユーザーの読書記録を返す
-        // JWT導入後は userId で絞り込む必要がある
-        return readingRecordRepository.findAll();
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        // userIdで絞り込み表示する
+        // WHERE userId = ? 指定と同じ
+        return readingRecordRepository.findByUserId(userId);
     }
 
     // =========================
@@ -190,8 +199,13 @@ public class LearningController {
     //
     @PostMapping("/readings")
     public List<ReadingRecord> addReadingRecord(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody ReadingRecord readingRecord
     ) {
+
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
+        readingRecord.setUserId(userId);
 
         // JSONデータをDB保存
         //
@@ -200,7 +214,7 @@ public class LearningController {
         readingRecordRepository.save(readingRecord);
 
         // 保存後の一覧返却
-        return readingRecordRepository.findAll();
+        return readingRecordRepository.findByUserId(userId);
     }
 
     // =========================
@@ -215,8 +229,12 @@ public class LearningController {
     //
     @DeleteMapping("/readings/{id}")
     public List<ReadingRecord> deleteReadingRecord(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID id
     ) {
+
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
 
         // 指定IDの読書記録を削除
         //
@@ -226,6 +244,6 @@ public class LearningController {
         readingRecordRepository.deleteById(id);
 
         // 削除後の一覧返却
-        return readingRecordRepository.findAll();
+        return readingRecordRepository.findByUserId(userId);
     }
 }

@@ -61,8 +61,9 @@ public interface DiaryEntryRepository
     // SELECT * FROM diary_entries
     // WHERE diary_date = ?
     //
-    Optional<DiaryEntry> findByDiaryDate(
-            LocalDate diaryDate
+    Optional<DiaryEntry> findByDiaryDateAndUserId(
+            LocalDate diaryDate,
+            UUID userId
     );
 
     // =========================

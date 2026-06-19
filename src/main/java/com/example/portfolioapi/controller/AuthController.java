@@ -42,6 +42,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 // =========================
 // Auth Controller
@@ -389,9 +390,21 @@ public class AuthController {
             @AuthenticationPrincipal Jwt jwt
     ) {
 
-        Map<String, Object> response =
-                new HashMap<>();
+        // JWTからuser_idを取得しbodyのuseIdに設定する
+        UUID userId = UUID.fromString(jwt.getSubject());
 
+        User user = userRepository.findById(userId)
+                .orElseThrow();
+
+        // ユーザID、ユーザ名、メールを格納し返却
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", user.getId());
+        response.put("name", user.getName());
+        response.put("email", user.getEmail());
+
+        return response;
+
+        /*
         response.put(
                 "success",
                 true
@@ -420,5 +433,6 @@ public class AuthController {
         );
 
         return response;
+        */
     }
 }
