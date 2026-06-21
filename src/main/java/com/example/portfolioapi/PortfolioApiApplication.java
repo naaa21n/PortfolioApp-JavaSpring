@@ -11,6 +11,7 @@ import org.springframework.boot.SpringApplication;
 
 // Spring Boot自動設定用
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 // =========================
 // Main Application Class
@@ -31,6 +32,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //
 // などを行う
 @SpringBootApplication
+@EnableJpaAuditing
 public class PortfolioApiApplication {
 
     // =========================

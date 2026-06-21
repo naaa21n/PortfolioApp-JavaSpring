@@ -1,4 +1,4 @@
-package com.example.portfolioapi.entity.task;
+package com.example.portfolioapi.entity.health;
 
 // =========================
 // Common Entity Import
@@ -21,64 +21,64 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 // =========================
-// Task Entity
+// JournalEntry Entity
 // =========================
 //
-// タスク情報を管理するEntity
+// ジャーナリング記録を管理するEntity
 //
 // 対応テーブル
-// tasks
+// journal_entries
 //
 // このクラスの1インスタンスが、
-// tasks テーブルの1行分のデータを表す
+// journal_entries テーブルの1行分のデータを表す
 //
 // 管理項目
 //
 // ・ユーザーID
-// ・タスク名
-// ・タスク日
-// ・締切日
-// ・詳細内容
-// ・完了状態
+// ・ジャーナル記録日
+// ・感謝したこと
+// ・頑張ったこと
+// ・明日の目標
+// ・自由記述
 //
-// タスク管理ページや
-// ToDo機能で利用する
+// 健康と日記ページの
+// ジャーナリング機能で利用する
 //
 @Entity
-@Table(name = "tasks")
+@Table(name = "journal_entries")
 
 // =========================
 // BaseEntity 継承
 // =========================
 //
 // BaseEntityを継承することで、
-// このTaskクラスには直接書いていない
+// このJournalEntryクラスには直接書いていない
 // 以下の共通カラムも自動で含まれる
 //
 // ・created_at
 // ・updated_at
 //
-// つまり、tasks テーブルは実質的に
+// つまり、journal_entries テーブルは実質的に
 //
 // id
 // user_id
-// title
-// task_date
-// deadline
-// content
-// completed
+// journal_date
+// gratitude
+// achievement
+// tomorrow_goal
+// free_text
 // created_at
 // updated_at
 //
 // のカラムを持つ
 //
-public class Task extends BaseEntity {
+public class JournalEntry extends BaseEntity {
 
     // =========================
     // Primary Key
     // =========================
     //
-    // tasks テーブルの主キー
+    // journal_entries テーブルの主キー
     //
     // UUID形式で自動生成される
     //
@@ -93,7 +93,7 @@ public class Task extends BaseEntity {
     // User ID
     // =========================
     //
-    // このタスクが
+    // このジャーナリング記録が
     // どのユーザーに紐づくデータかを表す
     //
     // DBカラム名:
@@ -111,78 +111,99 @@ public class Task extends BaseEntity {
     private UUID userId;
 
     // =========================
-    // Title
+    // Journal Date
     // =========================
     //
-    // タスク名
+    // ジャーナリング記録の日付
     //
     // 例:
-    // "Spring Bootを勉強する"
-    // "ポートフォリオを修正する"
-    //
-    // DBカラム名はJava変数名と同じ title なので
-    // @Column(name = "title") は省略している
-    //
-    private String title;
-
-    // =========================
-    // Task Date
-    // =========================
-    //
-    // タスクを実施する日付
-    //
-    // 例:
-    // 2026-06-12
+    // 2026-05-31
     //
     // Java側:
-    // taskDate
+    // journalDate
     //
     // DB側:
-    // task_date
+    // journal_date
     //
-    @Column(name = "task_date")
-    private LocalDate taskDate;
+    @Column(name = "journal_date")
+    private LocalDate journalDate;
 
     // =========================
-    // Deadline
+    // Gratitude
     // =========================
     //
-    // 締切日
+    // 感謝したこと
     //
     // 例:
-    // 2026-06-30
-    //
-    // DBカラム名はJava変数名と同じ deadline なので
-    // @Column(name = "deadline") は省略している
-    //
-    private LocalDate deadline;
-
-    // =========================
-    // Content
-    // =========================
-    //
-    // タスクの詳細内容
-    //
-    // 長文保存用
+    // 家族に感謝した
     //
     // DB型:
     // text
     //
     @Column(columnDefinition = "TEXT")
-    private String content;
+    private String gratitude;
 
     // =========================
-    // Completed
+    // Achievement
     // =========================
     //
-    // 完了状態
+    // 頑張ったこと
     //
-    // true  -> 完了
-    // false -> 未完了
+    // 例:
+    // 30分ジョギングした
     //
-    // ER図では completed
+    // DB型:
+    // text
     //
-    private boolean completed;
+    @Column(columnDefinition = "TEXT")
+    private String achievement;
+
+    // =========================
+    // Tomorrow Goal
+    // =========================
+    //
+    // 明日の目標
+    //
+    // 例:
+    // 読書を30分する
+    //
+    // Java側:
+    // tomorrowGoal
+    //
+    // DB側:
+    // tomorrow_goal
+    //
+    // DB型:
+    // text
+    //
+    @Column(
+            name = "tomorrow_goal",
+            columnDefinition = "TEXT"
+    )
+    private String tomorrowGoal;
+
+    // =========================
+    // Free Text
+    // =========================
+    //
+    // 自由記述
+    //
+    // 気づきや振り返りを記録
+    //
+    // Java側:
+    // freeText
+    //
+    // DB側:
+    // free_text
+    //
+    // DB型:
+    // text
+    //
+    @Column(
+            name = "free_text",
+            columnDefinition = "TEXT"
+    )
+    private String freeText;
 
     // =========================
     // Default Constructor
@@ -190,10 +211,7 @@ public class Task extends BaseEntity {
     //
     // JPAがEntityを生成するときに必要
     //
-    // DBから取得したデータを
-    // Taskオブジェクトに変換するときなどに使われる
-    //
-    public Task() {
+    public JournalEntry() {
     }
 
     // =========================
@@ -237,75 +255,72 @@ public class Task extends BaseEntity {
     }
 
     // =========================
-    // Title
+    // Journal Date
     // =========================
 
-    // タスク名取得
-    public String getTitle() {
-        return title;
+    // ジャーナル記録日取得
+    public LocalDate getJournalDate() {
+        return journalDate;
     }
 
-    // タスク名設定
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    // =========================
-    // Task Date
-    // =========================
-
-    // タスク日取得
-    public LocalDate getTaskDate() {
-        return taskDate;
-    }
-
-    // タスク日設定
-    public void setTaskDate(LocalDate taskDate) {
-        this.taskDate = taskDate;
+    // ジャーナル記録日設定
+    public void setJournalDate(LocalDate journalDate) {
+        this.journalDate = journalDate;
     }
 
     // =========================
-    // Deadline
+    // Gratitude
     // =========================
 
-    // 締切日取得
-    public LocalDate getDeadline() {
-        return deadline;
+    // 感謝したこと取得
+    public String getGratitude() {
+        return gratitude;
     }
 
-    // 締切日設定
-    public void setDeadline(LocalDate deadline) {
-        this.deadline = deadline;
-    }
-
-    // =========================
-    // Content
-    // =========================
-
-    // 詳細内容取得
-    public String getContent() {
-        return content;
-    }
-
-    // 詳細内容設定
-    public void setContent(String content) {
-        this.content = content;
+    // 感謝したこと設定
+    public void setGratitude(String gratitude) {
+        this.gratitude = gratitude;
     }
 
     // =========================
-    // Completed
+    // Achievement
     // =========================
 
-    // 完了状態取得
-    //
-    // boolean型なので isCompleted 命名
-    //
-    public boolean isCompleted() {
-        return completed;
+    // 頑張ったこと取得
+    public String getAchievement() {
+        return achievement;
     }
 
-    // 完了状態設定
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
+    // 頑張ったこと設定
+    public void setAchievement(String achievement) {
+        this.achievement = achievement;
+    }
+
+    // =========================
+    // Tomorrow Goal
+    // =========================
+
+    // 明日の目標取得
+    public String getTomorrowGoal() {
+        return tomorrowGoal;
+    }
+
+    // 明日の目標設定
+    public void setTomorrowGoal(String tomorrowGoal) {
+        this.tomorrowGoal = tomorrowGoal;
+    }
+
+    // =========================
+    // Free Text
+    // =========================
+
+    // 自由記述取得
+    public String getFreeText() {
+        return freeText;
+    }
+
+    // 自由記述設定
+    public void setFreeText(String freeText) {
+        this.freeText = freeText;
     }
 }

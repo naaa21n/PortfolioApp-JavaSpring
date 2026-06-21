@@ -1,10 +1,11 @@
-package com.example.portfolioapi.entity.task;
+package com.example.portfolioapi.entity.health;
 
 // =========================
 // Common Entity Import
 // =========================
 //
-// created_at / updated_at を継承するため
+// created_at / updated_at など、
+// 全Entityで共通利用する項目を継承するため
 //
 import com.example.portfolioapi.entity.common.BaseEntity;
 
@@ -21,64 +22,64 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 // =========================
-// Task Entity
+// HealthRecord Entity
 // =========================
 //
-// タスク情報を管理するEntity
+// 健康記録を管理するEntity
 //
 // 対応テーブル
-// tasks
+// health_records
 //
 // このクラスの1インスタンスが、
-// tasks テーブルの1行分のデータを表す
+// health_records テーブルの1行分のデータを表す
 //
 // 管理項目
 //
 // ・ユーザーID
-// ・タスク名
-// ・タスク日
-// ・締切日
-// ・詳細内容
-// ・完了状態
+// ・記録日
+// ・歩数
+// ・運動時間
+// ・睡眠時間
+// ・水分摂取量
 //
-// タスク管理ページや
-// ToDo機能で利用する
+// 健康ダッシュボードや
+// カレンダー機能で利用する
 //
 @Entity
-@Table(name = "tasks")
+@Table(name = "health_records")
 
 // =========================
 // BaseEntity 継承
 // =========================
 //
 // BaseEntityを継承することで、
-// このTaskクラスには直接書いていない
+// このHealthRecordクラスには直接書いていない
 // 以下の共通カラムも自動で含まれる
 //
 // ・created_at
 // ・updated_at
 //
-// つまり、tasks テーブルは実質的に
+// つまり、health_records テーブルは実質的に
 //
 // id
 // user_id
-// title
-// task_date
-// deadline
-// content
-// completed
+// record_date
+// steps
+// exercise_minutes
+// sleep_hours
+// water_ml
 // created_at
 // updated_at
 //
 // のカラムを持つ
 //
-public class Task extends BaseEntity {
+public class HealthRecord extends BaseEntity {
 
     // =========================
     // Primary Key
     // =========================
     //
-    // tasks テーブルの主キー
+    // health_records テーブルの主キー
     //
     // UUID形式で自動生成される
     //
@@ -93,7 +94,7 @@ public class Task extends BaseEntity {
     // User ID
     // =========================
     //
-    // このタスクが
+    // この健康記録が
     // どのユーザーに紐づくデータかを表す
     //
     // DBカラム名:
@@ -111,78 +112,107 @@ public class Task extends BaseEntity {
     private UUID userId;
 
     // =========================
-    // Title
+    // Record Date
     // =========================
     //
-    // タスク名
+    // 健康記録の日付
     //
     // 例:
-    // "Spring Bootを勉強する"
-    // "ポートフォリオを修正する"
-    //
-    // DBカラム名はJava変数名と同じ title なので
-    // @Column(name = "title") は省略している
-    //
-    private String title;
-
-    // =========================
-    // Task Date
-    // =========================
-    //
-    // タスクを実施する日付
-    //
-    // 例:
-    // 2026-06-12
+    // 2026-05-31
     //
     // Java側:
-    // taskDate
+    // recordDate
     //
     // DB側:
-    // task_date
+    // record_date
     //
-    @Column(name = "task_date")
-    private LocalDate taskDate;
+    @Column(name = "record_date")
+    private LocalDate recordDate;
 
     // =========================
-    // Deadline
+    // Steps
     // =========================
     //
-    // 締切日
+    // 歩数
+    //
+    // 単位:
+    // 歩
     //
     // 例:
-    // 2026-06-30
+    // 5000
+    // 10000
     //
-    // DBカラム名はJava変数名と同じ deadline なので
-    // @Column(name = "deadline") は省略している
+    // DBカラム名はJava変数名と同じ steps なので
+    // @Column(name = "steps") は省略している
     //
-    private LocalDate deadline;
+    private Integer steps;
 
     // =========================
-    // Content
+    // Exercise Minutes
     // =========================
     //
-    // タスクの詳細内容
+    // 運動時間
     //
-    // 長文保存用
+    // 単位:
+    // 分
     //
-    // DB型:
-    // text
+    // 例:
+    // 30
+    // 60
     //
-    @Column(columnDefinition = "TEXT")
-    private String content;
+    // Java側:
+    // exerciseMinutes
+    //
+    // DB側:
+    // exercise_minutes
+    //
+    @Column(name = "exercise_minutes")
+    private Integer exerciseMinutes;
 
     // =========================
-    // Completed
+    // Sleep Hours
     // =========================
     //
-    // 完了状態
+    // 睡眠時間
     //
-    // true  -> 完了
-    // false -> 未完了
+    // 単位:
+    // 時間
     //
-    // ER図では completed
+    // 例:
+    // 6.5
+    // 7.0
+    // 8.0
     //
-    private boolean completed;
+    // Java側:
+    // sleepHours
+    //
+    // DB側:
+    // sleep_hours
+    //
+    @Column(name = "sleep_hours")
+    private Double sleepHours;
+
+    // =========================
+    // Water Intake
+    // =========================
+    //
+    // 水分摂取量
+    //
+    // 単位:
+    // ml
+    //
+    // 例:
+    // 1500
+    // 2000
+    //
+    // Java側:
+    // waterMl
+    //
+    // DB側:
+    // water_ml
+    //
+    @Column(name = "water_ml")
+    private Integer waterMl;
 
     // =========================
     // Default Constructor
@@ -191,9 +221,9 @@ public class Task extends BaseEntity {
     // JPAがEntityを生成するときに必要
     //
     // DBから取得したデータを
-    // Taskオブジェクトに変換するときなどに使われる
+    // HealthRecordオブジェクトに変換するときなどに使われる
     //
-    public Task() {
+    public HealthRecord() {
     }
 
     // =========================
@@ -237,75 +267,72 @@ public class Task extends BaseEntity {
     }
 
     // =========================
-    // Title
+    // Record Date
     // =========================
 
-    // タスク名取得
-    public String getTitle() {
-        return title;
+    // 記録日取得
+    public LocalDate getRecordDate() {
+        return recordDate;
     }
 
-    // タスク名設定
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    // =========================
-    // Task Date
-    // =========================
-
-    // タスク日取得
-    public LocalDate getTaskDate() {
-        return taskDate;
-    }
-
-    // タスク日設定
-    public void setTaskDate(LocalDate taskDate) {
-        this.taskDate = taskDate;
+    // 記録日設定
+    public void setRecordDate(LocalDate recordDate) {
+        this.recordDate = recordDate;
     }
 
     // =========================
-    // Deadline
+    // Steps
     // =========================
 
-    // 締切日取得
-    public LocalDate getDeadline() {
-        return deadline;
+    // 歩数取得
+    public Integer getSteps() {
+        return steps;
     }
 
-    // 締切日設定
-    public void setDeadline(LocalDate deadline) {
-        this.deadline = deadline;
-    }
-
-    // =========================
-    // Content
-    // =========================
-
-    // 詳細内容取得
-    public String getContent() {
-        return content;
-    }
-
-    // 詳細内容設定
-    public void setContent(String content) {
-        this.content = content;
+    // 歩数設定
+    public void setSteps(Integer steps) {
+        this.steps = steps;
     }
 
     // =========================
-    // Completed
+    // Exercise Minutes
     // =========================
 
-    // 完了状態取得
-    //
-    // boolean型なので isCompleted 命名
-    //
-    public boolean isCompleted() {
-        return completed;
+    // 運動時間取得
+    public Integer getExerciseMinutes() {
+        return exerciseMinutes;
     }
 
-    // 完了状態設定
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
+    // 運動時間設定
+    public void setExerciseMinutes(Integer exerciseMinutes) {
+        this.exerciseMinutes = exerciseMinutes;
+    }
+
+    // =========================
+    // Sleep Hours
+    // =========================
+
+    // 睡眠時間取得
+    public Double getSleepHours() {
+        return sleepHours;
+    }
+
+    // 睡眠時間設定
+    public void setSleepHours(Double sleepHours) {
+        this.sleepHours = sleepHours;
+    }
+
+    // =========================
+    // Water Intake
+    // =========================
+
+    // 水分摂取量取得
+    public Integer getWaterMl() {
+        return waterMl;
+    }
+
+    // 水分摂取量設定
+    public void setWaterMl(Integer waterMl) {
+        this.waterMl = waterMl;
     }
 }
